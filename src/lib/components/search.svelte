@@ -4,9 +4,12 @@
 
 	import LogoIcon from './logoIcon.svelte';
 
+	// 在 script 标签顶部定义一个转换比例（通常 1rem = 16px）
+	const rootFontSize = 16;
+
 	let searchQuery = $state('');
 	let inputElement: HTMLTextAreaElement;
-	const MAX_HEIGHT = 200; // 设置最大高度（单位：像素）
+	const MAX_HEIGHT = 12.5; // 设置最大高度（单位：rem）
 
 	// 处理搜索跳转
 	const handleSearch = (e: KeyboardEvent) => {
@@ -37,18 +40,23 @@
 	$effect(() => {
 		// 依赖 searchQuery，内容变化时触发
 		if (searchQuery !== undefined && inputElement) {
-			// 先重置高度，以便重新计算 scrollHeight
+			// 1. 先重置高度，以便重新计算 scrollHeight
 			inputElement.style.height = 'auto';
 
-			const newHeight = inputElement.scrollHeight;
+			// 2. 获取像素值
+			const scrollHeightPx = inputElement.scrollHeight;
+
+			// 3. 转换为 rem
+			// 我们增加一个极小的偏移量（比如 0.1rem）防止某些浏览器下的微小溢出抖动
+			const newHeight = parseFloat((scrollHeightPx / rootFontSize).toFixed(3));
 
 			if (newHeight > MAX_HEIGHT) {
 				// 超过上限：锁定在最大高度，显示滚动条
-				inputElement.style.height = MAX_HEIGHT + 'px';
+				inputElement.style.height = MAX_HEIGHT + 'rem';
 				inputElement.style.overflowY = 'auto';
 			} else {
 				// 未超上限：自动撑开，隐藏滚动条
-				inputElement.style.height = newHeight + 'px';
+				inputElement.style.height = newHeight + 'rem';
 				inputElement.style.overflowY = 'hidden';
 			}
 		}
