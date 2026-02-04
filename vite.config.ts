@@ -9,6 +9,7 @@ export default defineConfig({
         UnoCSS(),
         sveltekit(),
     ],
+    base: './', // 强制使用相对路径
     build: {
         // 强制不进行内联，所有资源都作为独立文件
         assetsInlineLimit: 0,
