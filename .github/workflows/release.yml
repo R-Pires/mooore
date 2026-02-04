@@ -1,0 +1,78 @@
+name: 🚀 自动发布插件 Release
+
+on:
+  push:
+    tags:
+      - 'v*' # 只有推送到以 v 开头的标签（如 v1.0.1）才会触发
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    # 关键：赋予 Actions 写入 Release 的权限
+    permissions:
+      contents: write
+
+    steps:
+      - name: 📥 拉取代码
+        uses: actions/checkout@v6
+
+      - name: 🛠️ 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10 # 或者你本地使用的版本
+
+      - name: 🟢 设置 Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: 'pnpm'
+
+      - name: 📦 安装依赖
+        run: pnpm install
+
+      - name: 🏗️ 编译项目
+        run: pnpm run build
+
+      - name: 🧪 执行后处理脚本
+        run: node post-build.js # 确保你的脚本会将产物移至 chrome-extension 目录
+
+    #   - name: 🤐 压缩插件包
+    #     # 将准备好的 chrome-extension 文件夹压缩
+    #     run: zip -r mooore-${{ github.ref_name }}.zip chrome-extension/*
+
+      - name: 🤐 准备并压缩插件包
+        run: |
+          # 1. 定义最终文件夹名称（如 beyond-new-tab-v1.0.1）
+          export FOLDER_NAME="mooore-${{ github.ref_name }}"
+        
+          # 2. 将 post-build.js 处理完的 dist 文件夹改名为带版本的名字
+          # 这样解压出来后的目录就是 mooore-v1.0.1
+          mv dist $FOLDER_NAME
+        
+          # 3. 压缩这个文件夹
+          zip -r $FOLDER_NAME.zip $FOLDER_NAME
+
+      - name: 📢 创建 GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          # 告诉 GitHub 发布哪个文件
+          files: mooore-*.zip
+          # Release 的标题和描述
+          name: Release ${{ github.ref_name }}
+          body: |
+            ## 🎉 新版本发布！
+            这是由 GitHub Actions 自动构建的产物。
+            
+            ### 📝 更新内容
+            - 自动同步版本号: ${{ github.ref_name }}
+            - 核心功能已就绪
+            
+            ### 🛠️ 安装方法
+            1. 下载下方的 `mooore-${{ github.ref_name }}.zip`
+            2. 解压到本地文件夹
+            3. 在 Chrome 扩展程序页面开启“开发者模式”
+            4. 点击“加载已解压的扩展程序”，选择该文件夹
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 自动生成的权限令牌
