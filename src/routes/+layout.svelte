@@ -1,4 +1,8 @@
 <script lang="ts">
+	export const prerender = true;
+	export const trailingSlash = 'always'; // 强制路径结尾一致性
+	// 强制关闭服务器端渲染，让它在客户端作为一个纯粹的单页应用运行
+	export const ssr = false;
 	// 添加这一行配置，确保资源引用是相对的
 	/** @type {import('@sveltejs/kit').NavigationProvider} */
 	export const paths = {
@@ -10,6 +14,8 @@
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 
+	import { page } from '$app/stores';
+  	import Home from './+page.svelte'; // 引入你的首页组件
 	let { children } = $props();
 </script>
 
@@ -19,7 +25,11 @@
 	<!-- <Header /> -->
 
 	<main>
-		{@render children()}
+		{#if $page.error}
+			<Home />	
+		{:else}
+			{@render children()} 
+		{/if}
 	</main>
 
 	<footer>

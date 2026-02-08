@@ -32,7 +32,7 @@ jobs:
         run: pnpm run build
 
       - name: 🧪 执行后处理脚本
-        run: node post-build.js # 确保你的脚本会将产物移至 chrome-extension 目录
+        run: node post-build.ts # 确保你的脚本会将产物移至 chrome-extension 目录
 
     #   - name: 🤐 压缩插件包
     #     # 将准备好的 chrome-extension 文件夹压缩
@@ -43,7 +43,7 @@ jobs:
           # 1. 定义最终文件夹名称（如 beyond-new-tab-v1.0.1）
           export FOLDER_NAME="mooore-${{ github.ref_name }}"
         
-          # 2. 将 post-build.js 处理完的 dist 文件夹改名为带版本的名字
+          # 2. 将 post-build.ts 处理完的 dist 文件夹改名为带版本的名字
           # 这样解压出来后的目录就是 mooore-v1.0.1
           mv dist $FOLDER_NAME
         
