@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Mooore",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
@@ -10,8 +10,14 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["internal/*", "*.js", "*.css"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "internal/*",
+        "*.js",
+        "*.css"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ],
   "content_security_policy": {
